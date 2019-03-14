@@ -1,0 +1,31 @@
+##imports
+import requests
+from bs4 import BeautifulSoup
+import pandas as pd
+
+url     =  'https://en.wikipedia.org/wiki/List_of_countries_by_past_and_future_population'
+headers =  {'User-Agent': 'Mozilla/5.0'}
+page    =  requests.get(url, headers = headers)
+html    =  page.text
+
+#create soup (calling from BS)
+soup  = BeautifulSoup(page.text, features='html.parser')          #holding all the html data
+table_data  =  soup.find('table', class_="sortable wikitable")    #soup is holding subset of the html (tables) 
+
+table  =  soup.find('table', class_="sortable wikitable").tbody    #soup is holding subset of the html (tables) 
+
+rows = table.find_all('tr')
+columns = [v.text for v in rows[0].find_all('th')]
+
+df = pd.DataFrame(columns=columns)
+for i in range (1, len(rows)):
+    tds  = rows[i].find_all('td')
+    if len(tds) ==14:
+        values = [tds[0].text.replace('\n','').replace('\xa0',''), tds[1].text, tds[2].text, tds[3].text, tds[4].text, tds[5].text, tds[6].text, tds[7].text, tds[8].text, tds[9].text,tds[10].text, tds[11].text, tds[12].text, tds[13].text]    
+    else:
+        values = [td.text.replace('\n','').replace('\xa0','') for td in tds]
+    df = df.append(pd.Series(values, index=columns), ignore_index=True)
+    
+    df.to_csv(r'Desktop' +
+              'Output.csv', index=False)
+
