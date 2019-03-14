@@ -1,0 +1,17 @@
+#Loading the rvest package
+library(rvest)
+library(rvest)
+library(xml2)
+library(magrittr)
+
+#Specifying the url for desired website to be scraped
+url <- 'https://en.wikipedia.org/wiki/List_of_countries_by_past_and_future_population'
+
+#Reading the HTML code from the website
+webpage <- read_html(url)
+
+global_pop <- webpage %>%
+  html_nodes(xpath='//*[@id="mw-content-text"]/div/table[1]') %>%
+  html_table()
+global_pop <- global_pop[[1]]
+
